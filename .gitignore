@@ -216,9 +216,6 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
-*.pth
-*.pt
-*.bin
-*.safetensors
-checkpoint-*/
-mini_gpt/checkpoint-*/
+
+backend/models/slm/checkpoint-*/
+backend/models/slm/checkpoint-*/
