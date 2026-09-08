@@ -219,3 +219,4 @@ __marimo__/
 
 backend/models/slm/checkpoint-*/
 backend/models/slm/checkpoint-*/
+android/app/build/
