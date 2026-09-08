@@ -7,7 +7,8 @@ from backend.pipeline.ENCOD import SchemaEx
 from backend.pipeline.TENSORING import (
     make_tensor,
     load_autoencoder,
-    make_embedding
+    make_embedding,
+    get_or_train_autoencoder
 )
 
 from backend.pipeline.slm_inference import (
@@ -20,11 +21,10 @@ from backend.pipeline.slm_inference import (
 
 MODEL_PATH = "backend/data/autoencoder.pth"
 
-autoencoder, device = load_autoencoder(
+autoencoder_27, device = load_autoencoder(
     MODEL_PATH,
     27
 )
-
 
 # =============================================================
 # FASTAPI
@@ -36,7 +36,6 @@ app = FastAPI(
     version="0.1.0"
 )
 
-
 # =============================================================
 # REQUEST
 # =============================================================
@@ -44,18 +43,20 @@ app = FastAPI(
 class AskRequest(BaseModel):
     data: list[dict]
     question: str
+
+class EncodeRequest(BaseModel):
+    data: list[dict]
+
 # =============================================================
 # ROOT
 # =============================================================
 
 @app.get("/")
 def root():
-
     return {
         "status": "running",
         "message": "SchemaX backend is alive"
     }
-
 
 # =============================================================
 # HEALTH
@@ -63,11 +64,9 @@ def root():
 
 @app.get("/health")
 def health():
-
     return {
         "status": "healthy"
     }
-
 
 # =============================================================
 # ENCODE
@@ -75,34 +74,19 @@ def health():
 
 @app.post("/encode")
 def encode(request: EncodeRequest):
-
-    df = pd.DataFrame(
-        request.data
-    )
-
+    df = pd.DataFrame(request.data)
     df = df.dropna()
 
     encoder = SchemaEx()
+    encoded_data = encoder.detect_and_encode(df)
 
-    encoded_data = (
-        encoder.detect_and_encode(df)
-    )
-
-    print(
-        "ENCODE:",
-        encoded_data.shape
-    )
+    print("ENCODE:", encoded_data.shape)
 
     return {
-
         "rows": encoded_data.shape[0],
-
         "features": encoded_data.shape[1],
-
-        "encoded_data":
-            encoded_data.tolist()
+        "encoded_data": encoded_data.tolist()
     }
-
 
 # =============================================================
 # TENSOR
@@ -110,43 +94,21 @@ def encode(request: EncodeRequest):
 
 @app.post("/tensor")
 def tensor(request: EncodeRequest):
-
-    df = pd.DataFrame(
-        request.data
-    )
-
+    df = pd.DataFrame(request.data)
     df = df.dropna()
 
     encoder = SchemaEx()
+    encoded_data = encoder.detect_and_encode(df)
+    tensor_data = make_tensor(encoded_data)
 
-    encoded_data = (
-        encoder.detect_and_encode(df)
-    )
-
-    tensor_data = make_tensor(
-        encoded_data
-    )
-
-    print(
-        "TENSOR:",
-        tensor_data.shape
-    )
+    print("TENSOR:", tensor_data.shape)
 
     return {
-
-        "rows":
-            tensor_data.shape[0],
-
-        "features":
-            tensor_data.shape[1],
-
-        "dtype":
-            str(tensor_data.dtype),
-
-        "tensor":
-            tensor_data.tolist()
+        "rows": tensor_data.shape[0],
+        "features": tensor_data.shape[1],
+        "dtype": str(tensor_data.dtype),
+        "tensor": tensor_data.tolist()
     }
-
 
 # =============================================================
 # EMBED
@@ -154,228 +116,73 @@ def tensor(request: EncodeRequest):
 
 @app.post("/embed")
 def embed(request: EncodeRequest):
-
-    df = pd.DataFrame(
-        request.data
-    )
-
+    df = pd.DataFrame(request.data)
     df = df.dropna()
 
     if df.empty:
-
-        return {
-            "error":
-                "No valid rows remain after removing missing values."
-        }
-
-    # ---------------------------------------------------------
-    # ENCODE
-    # ---------------------------------------------------------
+        return {"error": "No valid rows remain after removing missing values."}
 
     encoder = SchemaEx()
+    encoded_data = encoder.detect_and_encode(df)
 
-    encoded_data = (
-        encoder.detect_and_encode(df)
-    )
+    print("EMBED encoded shape:", encoded_data.shape)
 
-    print(
-        "EMBED encoded shape:",
-        encoded_data.shape
-    )
-
-    # ---------------------------------------------------------
-    # CHECK FEATURES
-    # ---------------------------------------------------------
-
-    if encoded_data.shape[1] != 27:
-
-        return {
-
-            "error":
-                "Encoded feature count is incompatible with AutoEncoder.",
-
-            "input_encoded_shape":
-                list(encoded_data.shape),
-
-            "expected_features":
-                27,
-
-            "message":
-                "This JSON was encoded successfully, "
-                "but the resulting feature count is not 27."
-        }
-
-    # ---------------------------------------------------------
-    # TENSOR
-    # ---------------------------------------------------------
-
-    tensor_data = make_tensor(
-        encoded_data
-    )
-
-    print(
-        "EMBED tensor shape:",
-        tensor_data.shape
-    )
-
-    # ---------------------------------------------------------
-    # TENSOR SAFETY CHECK
-    # ---------------------------------------------------------
+    tensor_data = make_tensor(encoded_data)
 
     if tensor_data.ndim != 2:
+        return {"error": "Tensor must be 2-dimensional.", "tensor_shape": list(tensor_data.shape)}
 
-        return {
-            "error":
-                "Tensor must be 2-dimensional.",
-            "tensor_shape":
-                list(tensor_data.shape)
-        }
-
-    if tensor_data.shape[1] != 27:
-
-        return {
-
-            "error":
-                "Tensor feature count is incompatible with AutoEncoder.",
-
-            "tensor_shape":
-                list(tensor_data.shape),
-
-            "expected_features":
-                27
-        }
-
-    # ---------------------------------------------------------
-    # EMBEDDING
-    # ---------------------------------------------------------
-
-    embedding = make_embedding(
-        tensor_data,
-        autoencoder,
-        device
+    model, device_used = get_or_train_autoencoder(
+        tensor_data, device, pretrained_model=autoencoder_27, pretrained_features=27
     )
+    embedding = make_embedding(tensor_data, model, device_used)
 
-    print(
-        "EMBEDDING shape:",
-        embedding.shape
-    )
-
-    # ---------------------------------------------------------
-    # RESPONSE
-    # ---------------------------------------------------------
+    print("EMBEDDING shape:", embedding.shape)
 
     return {
-
-        "rows":
-            embedding.shape[0],
-
-        "embedding_features":
-            embedding.shape[1],
-
-        "embedding":
-            embedding.tolist()
+        "rows": embedding.shape[0],
+        "embedding_features": embedding.shape[1],
+        "embedding": embedding.tolist()
     }
+
+# =============================================================
+# ASK
+# =============================================================
 
 @app.post("/ask")
 def ask(request: AskRequest):
-
-    # =========================
-    # JSON → DATAFRAME
-    # =========================
-
     df = pd.DataFrame(request.data)
-
     df = df.dropna()
 
     if df.empty:
-        return {
-            "error": "No valid data remains after removing missing values."
-        }
-
-    # =========================
-    # ENCODE
-    # =========================
+        return {"error": "No valid data remains after removing missing values."}
 
     encoder = SchemaEx()
-
     encoded_data = encoder.detect_and_encode(df)
 
-    print(
-        "ASK encoded shape:",
-        encoded_data.shape
+    print("ASK encoded shape:", encoded_data.shape)
+
+    tensor_data = make_tensor(encoded_data)
+
+    model, device_used = get_or_train_autoencoder(
+        tensor_data, device, pretrained_model=autoencoder_27, pretrained_features=27
     )
+    embedding = make_embedding(tensor_data, model, device_used)
 
-    # =========================
-    # 27 FEATURE CHECK
-    # =========================
-
-    if encoded_data.shape[1] != 27:
-
-        return {
-            "error": "Input must produce exactly 27 encoded features.",
-            "features": encoded_data.shape[1],
-            "expected": 27
-        }
-
-    # =========================
-    # TENSOR
-    # =========================
-
-    tensor_data = make_tensor(
-        encoded_data
-    )
-
-    print(
-        "ASK tensor shape:",
-        tensor_data.shape
-    )
-
-    # =========================
-    # EMBEDDING
-    # =========================
-
-    embedding = make_embedding(
-        tensor_data,
-        autoencoder,
-        device
-    )
-
-    print(
-        "ASK embedding shape:",
-        embedding.shape
-    )
-
-    # =========================
-    # SLM
-    # =========================
+    print("ASK embedding shape:", embedding.shape)
 
     prompt = (
         request.question
         + "\n\n"
         + "Data embedding: "
-        + ", ".join(
-            f"{float(x):.3f}"
-            for x in embedding[0]
-        )
+        + ", ".join(f"{float(x):.3f}" for x in embedding[0])
         + "\nAnswer:"
     )
 
-    answer = generate_text(
-        prompt
-    )
-
-    # =========================
-    # RESPONSE
-    # =========================
+    answer = generate_text(prompt)
 
     return {
-
-        "question":
-            request.question,
-
-        "embedding_features":
-            embedding.shape[1],
-
-        "answer":
-            answer
+        "question": request.question,
+        "embedding_features": embedding.shape[1],
+        "answer": answer
     }

@@ -1,0 +1,24 @@
+{
+  "name": "something",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/VIXIYAGE/somethingmore.ai.git"
+  },
+  "keywords": [],
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/VIXIYAGE/somethingmore.ai/issues"
+  },
+  "homepage": "https://github.com/VIXIYAGE/somethingmore.ai#readme",
+  "dependencies": {
+    "@capacitor/android": "^8.5.1",
+    "@capacitor/cli": "^8.5.1",
+    "@capacitor/core": "^8.5.1"
+  }
+}
