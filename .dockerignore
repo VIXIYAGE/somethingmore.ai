@@ -1,0 +1,8 @@
+venv/
+.venv/
+__pycache__/
+*.pyc
+.git/
+
+backend/models/slm/checkpoint-6000/
+backend/models/slm/checkpoint-6050/
