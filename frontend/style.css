@@ -1,522 +1,345 @@
+:root {
+    --bg: #0000AA;
+    --panel-bg: #000088;
+    --fg: #FFFFFF;
+    --fg-dim: #AAAAAA;
+    --accent: #FFFF00;
+    --cyan: #00AAAA;
+}
+
 * {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
 }
 
-
 body {
-
-    background: #0a0a0a;
-
-    color: #e5e5e5;
-
-    font-family:
-        Arial,
-        Helvetica,
-        sans-serif;
-
+    background: var(--bg);
+    color: var(--fg);
+    font-family: "Courier New", Courier, monospace;
     min-height: 100vh;
-
     overflow-x: hidden;
 }
 
-
-/* ================= NOISE ================= */
-
-.noise {
-
+/* ================= SCANLINES ================= */
+.scanlines {
     position: fixed;
-
     inset: 0;
-
     pointer-events: none;
-
-    opacity: 0.04;
-
     z-index: 10;
-
-    background-image:
-        url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.8'/%3E%3C/svg%3E");
+    background: repeating-linear-gradient(
+        to bottom,
+        rgba(255, 255, 255, 0.035) 0px,
+        rgba(255, 255, 255, 0.035) 1px,
+        transparent 1px,
+        transparent 3px
+    );
 }
 
-
 /* ================= APP ================= */
-
 .app {
-
     width: min(900px, 92%);
-
     margin: auto;
-
     padding: 35px 0 70px;
 }
 
-
 /* ================= HEADER ================= */
-
 header {
-
     display: flex;
-
     justify-content: space-between;
-
     align-items: center;
-
-    padding-bottom: 30px;
-
-    border-bottom: 1px solid #292929;
+    padding-bottom: 20px;
+    border-bottom: 3px double var(--fg);
 }
-
 
 .logo-wrap {
-
     position: relative;
 }
-
 
 .logo {
-
     font-size: 30px;
-
     font-weight: 900;
-
-    letter-spacing: -2px;
-
-    color: white;
-
-    animation:
-        invertPulse 4s infinite;
+    letter-spacing: -1px;
+    color: var(--accent);
+    animation: invertPulse 4s infinite;
 }
-
 
 .logo span {
-
-    color: #777;
-
+    color: var(--cyan);
 }
-
 
 .logo-glitch {
-
     position: absolute;
-
     top: 0;
-
     left: 0;
-
     font-size: 30px;
-
     font-weight: 900;
-
-    letter-spacing: -2px;
-
-    color: white;
-
+    letter-spacing: -1px;
+    color: var(--fg);
     opacity: 0;
-
     animation: glitch 3s infinite;
-
 }
-
 
 .status {
-
-    font-size: 10px;
-
+    font-size: 12px;
     letter-spacing: 2px;
-
-    color: #777;
-
+    color: var(--fg-dim);
 }
 
+.cursor {
+    display: inline-block;
+    margin-left: 4px;
+    animation: blink 1s steps(2, start) infinite;
+}
 
 /* ================= HERO ================= */
-
 .hero {
-
-    padding: 90px 0 70px;
-
+    padding: 70px 0 60px;
 }
-
 
 .eyebrow {
-
-    font-size: 11px;
-
-    letter-spacing: 4px;
-
-    color: #666;
-
-    margin-bottom: 20px;
+    font-size: 12px;
+    letter-spacing: 3px;
+    color: var(--cyan);
+    margin-bottom: 18px;
 }
-
 
 .hero h1 {
-
-    font-size: clamp(45px, 8vw, 85px);
-
-    line-height: 0.95;
-
-    letter-spacing: -5px;
-
+    font-size: clamp(34px, 6vw, 58px);
+    line-height: 1.05;
+    letter-spacing: -1px;
     font-weight: 900;
-
+    color: var(--fg);
 }
-
 
 .hero h1 span {
-
-    color: #555;
-
+    color: var(--accent);
 }
-
 
 .hero p {
-
-    max-width: 550px;
-
-    margin-top: 30px;
-
-    color: #777;
-
+    max-width: 520px;
+    margin-top: 25px;
+    color: var(--fg-dim);
     line-height: 1.7;
-
+    font-size: 14px;
 }
 
-
-/* ================= PANEL ================= */
-
+/* ================= PANEL (DOS window) ================= */
 .panel {
-
-    position: relative;
-
-    border: 1px solid #292929;
-
-    background: #101010;
-
-    padding: 35px;
-
+    border: 2px solid var(--fg);
+    background: var(--panel-bg);
     margin-bottom: 25px;
-
-    transition: 0.3s;
-
+    box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.4);
 }
 
-
-.panel:hover {
-
-    border-color: #555;
-
-    transform: translateY(-2px);
-
-}
-
-
-.panel-number {
-
-    position: absolute;
-
-    right: 25px;
-
-    top: 25px;
-
-    font-size: 10px;
-
-    color: #444;
-
-}
-
-
-.panel h2 {
-
+.titlebar {
+    background: var(--fg);
+    color: var(--bg);
+    padding: 8px 14px;
     font-size: 13px;
-
-    letter-spacing: 3px;
-
-    margin-bottom: 15px;
-
+    font-weight: 900;
+    letter-spacing: 2px;
 }
 
+.titlebar .tag {
+    color: var(--bg);
+    opacity: 0.6;
+    margin-right: 8px;
+}
+
+.panel-body {
+    padding: 28px;
+}
 
 .hint {
-
-    color: #666;
-
+    color: var(--fg-dim);
     font-size: 13px;
-
-    margin-bottom: 25px;
-
+    line-height: 1.6;
+    margin-bottom: 22px;
 }
-
 
 .hint strong {
-
-    color: #aaa;
-
+    color: var(--accent);
 }
-
 
 /* ================= DROP ZONE ================= */
-
 .drop-zone {
-
     display: block;
-
-    border: 1px dashed #444;
-
-    padding: 50px 20px;
-
+    border: 2px dashed var(--fg-dim);
+    padding: 45px 20px;
     text-align: center;
-
     cursor: pointer;
-
-    transition: 0.3s;
-
+    transition: 0.15s;
+    background: #000066;
 }
-
 
 .drop-zone:hover {
-
-    background: #181818;
-
-    border-color: #888;
-
+    border-color: var(--accent);
+    background: #000077;
 }
-
 
 .upload-icon {
-
-    font-size: 35px;
-
-    color: #777;
-
-    margin-bottom: 15px;
-
+    font-size: 26px;
+    color: var(--cyan);
+    margin-bottom: 12px;
+    font-weight: 900;
 }
-
 
 .file-title {
-
     font-size: 14px;
-
-    letter-spacing: 3px;
-
+    letter-spacing: 2px;
     font-weight: bold;
-
+    color: var(--fg);
 }
-
 
 .file-subtitle {
-
     margin-top: 8px;
-
-    color: #555;
-
+    color: var(--fg-dim);
     font-size: 11px;
-
 }
-
 
 /* ================= QUESTION ================= */
-
 textarea {
-
     width: 100%;
-
-    min-height: 140px;
-
+    min-height: 130px;
     resize: vertical;
-
-    background: #080808;
-
-    border: 1px solid #292929;
-
-    color: white;
-
-    padding: 20px;
-
-    font-size: 15px;
-
+    background: #000066;
+    border: 2px solid var(--fg-dim);
+    color: var(--fg);
+    padding: 18px;
+    font-size: 14px;
+    font-family: inherit;
     outline: none;
-
+    caret-color: var(--accent);
 }
-
 
 textarea:focus {
-
-    border-color: #777;
-
+    border-color: var(--accent);
 }
 
+textarea::placeholder {
+    color: #7777bb;
+}
 
 /* ================= BUTTON ================= */
-
 .action {
-
-    margin: 35px 0;
-
+    margin: 30px 0;
 }
-
 
 button {
-
     width: 100%;
-
-    border: none;
-
-    background: white;
-
-    color: black;
-
-    padding: 22px;
-
+    border: 2px solid var(--fg);
+    background: var(--fg);
+    color: var(--bg);
+    padding: 20px;
     font-weight: 900;
-
     letter-spacing: 3px;
-
+    font-family: inherit;
+    font-size: 14px;
     cursor: pointer;
-
     display: flex;
-
     justify-content: space-between;
-
-    transition: 0.3s;
-
+    transition: 0.1s;
 }
-
 
 button:hover {
-
-    background: #bdbdbd;
-
-    letter-spacing: 5px;
-
+    background: var(--cyan);
+    color: var(--fg);
+    border-color: var(--fg);
 }
-
 
 .arrow {
-
-    font-size: 20px;
-
+    font-size: 16px;
+    font-weight: 900;
 }
-
 
 /* ================= OUTPUT ================= */
-
 .output {
-
-    background: #080808;
-
-    border-left: 2px solid #666;
-
-    padding: 25px;
-
+    background: #000055;
+    border-left: 4px solid var(--accent);
+    padding: 22px;
     min-height: 100px;
-
-    color: #aaa;
-
+    color: var(--fg);
     line-height: 1.7;
-
     white-space: pre-wrap;
-
+    font-size: 13px;
 }
-
 
 .result {
-
     display: none;
-
 }
-
 
 /* ================= FOOTER ================= */
-
 footer {
-
     display: flex;
-
     justify-content: space-between;
-
-    margin-top: 50px;
-
-    padding-top: 20px;
-
-    border-top: 1px solid #222;
-
-    color: #444;
-
-    font-size: 9px;
-
+    margin-top: 45px;
+    padding-top: 18px;
+    border-top: 3px double var(--fg);
+    color: var(--fg-dim);
+    font-size: 10px;
     letter-spacing: 2px;
-
 }
 
-
 /* ================= ANIMATIONS ================= */
-
 @keyframes invertPulse {
-
     0%, 85%, 100% {
         filter: invert(0);
     }
-
     88% {
         filter: invert(1);
     }
-
     91% {
         filter: invert(0);
     }
-
     94% {
         filter: invert(1);
     }
 }
 
-
 @keyframes glitch {
-
     0%, 90%, 100% {
         opacity: 0;
         transform: translate(0);
     }
-
     92% {
         opacity: 0.7;
-        transform: translate(-4px, 2px);
+        transform: translate(-3px, 2px);
     }
-
     94% {
         opacity: 0;
     }
-
     96% {
         opacity: 0.5;
-        transform: translate(4px, -2px);
+        transform: translate(3px, -2px);
     }
 }
 
+@keyframes blink {
+    0%, 50% {
+        opacity: 1;
+    }
+    50.01%, 100% {
+        opacity: 0;
+    }
+}
 
 /* ================= MOBILE ================= */
-
 @media (max-width: 600px) {
-
     .app {
         width: 90%;
     }
 
     .hero {
-        padding: 60px 0;
+        padding: 50px 0;
     }
 
-    .panel {
-        padding: 25px;
+    .panel-body {
+        padding: 20px;
     }
 
     footer {
         flex-direction: column;
         gap: 10px;
     }
-
 }

@@ -1,209 +1,143 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
     <meta charset="UTF-8">
-
     <meta
         name="viewport"
         content="width=device-width, initial-scale=1.0"
     >
-
-    <title>VOID.AI</title>
-
+    <title>MASTRAM.ai</title>
     <link
         rel="stylesheet"
         href="style.css"
     >
-
 </head>
-
 <body>
-
-    <div class="noise"></div>
-
+    <div class="scanlines"></div>
     <main class="app">
-
         <!-- ================= HEADER ================= -->
-
         <header>
-
             <div class="logo-wrap">
-
                 <div class="logo">
-                    VOID<span>.AI</span>
+                    MASTRAM<span>.ai</span>
                 </div>
-
                 <div class="logo-glitch">
-                    VOID.AI
+                    MASTRAM.ai
                 </div>
-
             </div>
-
             <div class="status">
-                ● SYSTEM ONLINE
+                SYSTEM ONLINE<span class="cursor">_</span>
             </div>
-
         </header>
 
-
         <!-- ================= HERO ================= -->
-
         <section class="hero">
-
             <div class="eyebrow">
-                STRUCTURED DATA → INTELLIGENCE
+                STRUCTURED DATA &gt; INTELLIGENCE
             </div>
-
             <h1>
                 Feed the machine.
                 <br>
                 <span>Ask it anything.</span>
             </h1>
-
             <p>
                 Upload a JSON dataset and let the model
                 process it through the neural pipeline.
             </p>
-
         </section>
-
 
         <!-- ================= INPUT ================= -->
-
         <section class="panel">
-
-            <div class="panel-number">
-                01
+            <div class="titlebar">
+                <span class="tag">[ 01 ]</span> DATA INPUT
             </div>
-
-            <h2>
-                DATA INPUT
-            </h2>
-
-            <p class="hint">
-                Upload a JSON file containing
-                <strong>exactly 27 features per row.</strong>
-            </p>
-
-
-            <label
-                class="drop-zone"
-                id="dropZone"
-            >
-
-                <input
-                    type="file"
-                    id="fileInput"
-                    accept=".json"
-                    hidden
+            <div class="panel-body">
+                <p class="hint">
+                    Upload a JSON file. Data matching the trained
+                    <strong>27-feature schema</strong> uses the trained model directly —
+                    other shapes are adapted automatically.
+                </p>
+                <label
+                    class="drop-zone"
+                    id="dropZone"
                 >
-
-                <div class="upload-icon">
-                    ↑
-                </div>
-
-                <div
-                    class="file-title"
-                    id="fileTitle"
-                >
-                    DROP JSON HERE
-                </div>
-
-                <div class="file-subtitle">
-                    or click to browse
-                </div>
-
-            </label>
-
+                    <input
+                        type="file"
+                        id="fileInput"
+                        accept=".json"
+                        hidden
+                    >
+                    <div class="upload-icon">
+                        ^
+                    </div>
+                    <div
+                        class="file-title"
+                        id="fileTitle"
+                    >
+                        DROP JSON HERE
+                    </div>
+                    <div class="file-subtitle">
+                        or click to browse
+                    </div>
+                </label>
+            </div>
         </section>
-
 
         <!-- ================= QUESTION ================= -->
-
         <section class="panel">
-
-            <div class="panel-number">
-                02
+            <div class="titlebar">
+                <span class="tag">[ 02 ]</span> YOUR QUESTION
             </div>
-
-            <h2>
-                YOUR QUESTION
-            </h2>
-
-            <textarea
-                id="question"
-                placeholder="Ask something about your data..."
-            ></textarea>
-
+            <div class="panel-body">
+                <textarea
+                    id="question"
+                    placeholder="Ask something about your data..."
+                ></textarea>
+            </div>
         </section>
 
-
         <!-- ================= ACTION ================= -->
-
         <section class="action">
-
             <button
                 id="askButton"
                 onclick="askModel()"
             >
-
                 <span>
                     RUN THE MACHINE
                 </span>
-
                 <span class="arrow">
-                    →
+                    &gt;
                 </span>
-
             </button>
-
         </section>
 
-
         <!-- ================= OUTPUT ================= -->
-
         <section
             class="result panel"
             id="resultPanel"
         >
-
-            <div class="panel-number">
-                03
+            <div class="titlebar">
+                <span class="tag">[ 03 ]</span> MODEL OUTPUT
             </div>
-
-            <h2>
-                MODEL OUTPUT
-            </h2>
-
-            <div
-                id="output"
-                class="output"
-            >
-                Waiting for input...
+            <div class="panel-body">
+                <div
+                    id="output"
+                    class="output"
+                >
+                    Waiting for input...
+                </div>
             </div>
-
         </section>
 
-
         <footer>
-
             <span>
-                VOID.AI
+                MASTRAM.ai
             </span>
-
             <span>
                 ENCODER / AUTOENCODER / SLM
             </span>
-
         </footer>
-
     </main>
-
-
     <script src="app.js"></script>
-
 </body>
-
 </html>
