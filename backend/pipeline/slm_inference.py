@@ -1,25 +1,29 @@
 import torch
 from transformers import GPT2LMHeadModel, GPT2TokenizerFast
 
-
 MODEL_PATH = "backend/models/slm"
 
-
-tokenizer = GPT2TokenizerFast.from_pretrained(
-    MODEL_PATH
-)
-
-tokenizer.pad_token = tokenizer.eos_token
+tokenizer = None
+model = None
 
 
-model = GPT2LMHeadModel.from_pretrained(
-    MODEL_PATH
-)
+def load_model():
+    global tokenizer, model
 
-model.eval()
+    if model is None:
+        print("Loading SLM...")
+
+        tokenizer = GPT2TokenizerFast.from_pretrained(MODEL_PATH)
+        tokenizer.pad_token = tokenizer.eos_token
+
+        model = GPT2LMHeadModel.from_pretrained(MODEL_PATH)
+        model.eval()
+
+        print("SLM loaded.")
 
 
 def generate_text(prompt):
+    load_model()
 
     inputs = tokenizer(
         prompt,
@@ -29,7 +33,6 @@ def generate_text(prompt):
     )
 
     with torch.no_grad():
-
         output = model.generate(
             **inputs,
             max_new_tokens=30,
